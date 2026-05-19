@@ -28,36 +28,48 @@ Hint: Some strategies for carrying out such proofs are described at the end of
 Section 3.3 in the Hitchhiker's Guide. -/
 
 theorem I (a : Prop) :
-    a → a :=
-  sorry
+    a → a := by
+  intros ha
+  apply ha
 
 theorem K (a b : Prop) :
-    a → b → b :=
-  sorry
+    a → b → b := by
+  intros ha hb
+  apply hb
 
 theorem C (a b c : Prop) :
-    (a → b → c) → b → a → c :=
-  sorry
+    (a → b → c) → b → a → c := by
+  intros hab hb ha
+  exact (hab ha hb)
 
 theorem proj_fst (a : Prop) :
-    a → a → a :=
-  sorry
+    a → a → a := by
+  intros
+  assumption
 
 /- Please give a different answer than for `proj_fst`: -/
 
 theorem proj_snd (a : Prop) :
-    a → a → a :=
-  sorry
+    a → a → a := by
+  intros ha1 ha2
+  exact ha2
 
 theorem some_nonsense (a b c : Prop) :
-    (a → b → c) → a → (a → c) → b → c :=
-  sorry
+    (a → b → c) → a → (a → c) → b → c := by
+  intros habc ha hac hb
+  exact (hac ha)
+
 
 /- 1.2. Prove the contraposition rule using basic tactics. -/
 
 theorem contrapositive (a b : Prop) :
-    (a → b) → ¬ b → ¬ a :=
-  sorry
+    (a → b) → ¬ b → ¬ a := by
+  rw [Not] at *
+  intros hab hNotB ha
+  apply hNotB
+  apply hab
+  exact ha
+
 
 /- 1.3. Prove the distributivity of `∀` over `∧` using basic tactics.
 
@@ -66,8 +78,24 @@ forward reasoning, like in the proof of `and_swap_braces` in the lecture, might
 be necessary. -/
 
 theorem forall_and {α : Type} (p q : α → Prop) :
-    (∀x, p x ∧ q x) ↔ (∀x, p x) ∧ (∀x, q x) :=
-  sorry
+    (∀x, p x ∧ q x) ↔ (∀x, p x) ∧ (∀x, q x) := by
+  apply Iff.intro
+  . intro h
+    apply And.intro
+    . intro x
+      apply And.left
+      apply h
+    . intro x
+      apply And.right
+      apply h
+  . intro h x
+    apply And.intro
+    . apply (And.left h)
+    . apply (And.right h)
+
+
+
+
 
 
 /- ## Question 2: Natural Numbers
@@ -78,32 +106,55 @@ theorem forall_and {α : Type} (p q : α → Prop) :
 #check mul
 
 theorem mul_zero (n : ℕ) :
-    mul 0 n = 0 :=
-  sorry
+    mul 0 n = 0 := by
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    simp [mul] at *
+    rw [ih]
+    rfl
+
 
 #check add_succ
 theorem mul_succ (m n : ℕ) :
-    mul (Nat.succ m) n = add (mul m n) n :=
-  sorry
+    mul (Nat.succ m) n = add (mul m n) n := by
+  induction n with
+  | zero => rfl
+  | succ n' ih =>
+    simp [add, mul, ih]
+    rw [add_assoc, add_succ]
+
 
 /- 2.2. Prove commutativity and associativity of multiplication using the
 `induction` tactic. Choose the induction variable carefully. -/
 
 theorem mul_comm (m n : ℕ) :
-    mul m n = mul n m :=
-  sorry
+    mul m n = mul n m := by
+  induction m with
+  | zero =>
+    simp [mul]
+    apply mul_zero
+  | succ m' ih =>
+    simp [mul]
+    rw [← ih, mul_succ]
+    apply add_comm
 
 theorem mul_assoc (l m n : ℕ) :
-    mul (mul l m) n = mul l (mul m n) :=
-  sorry
+    mul (mul l m) n = mul l (mul m n) := by
+  induction n with
+  | zero =>
+    simp [mul]
+  | succ n' ih =>
+    simp [mul, mul_add, ih]
 
 /- 2.3. Prove the symmetric variant of `mul_add` using `rw`. To apply
 commutativity at a specific position, instantiate the rule by passing some
 arguments (e.g., `mul_comm _ l`). -/
 
 theorem add_mul (l m n : ℕ) :
-    add (mul n l) (mul n m) = mul (add l m) n :=
-  sorry
+    add (mul n l) (mul n m) = mul (add l m) n := by
+  rw [mul_comm _ n]
+  rw [mul_add]
 
 
 /- ## Question 3 (**optional**): Intuitionistic Logic
