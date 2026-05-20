@@ -180,10 +180,23 @@ def DoubleNegation : Prop :=
 Hint: You will need `Or.elim` and `False.elim`. You can use
 `rw [ExcludedMiddle]` to unfold the definition of `ExcludedMiddle`,
 and similarly for `Peirce`. -/
+#check False.elim
 
 theorem Peirce_of_EM :
-    ExcludedMiddle → Peirce :=
-  sorry
+    ExcludedMiddle → Peirce := by
+  rw [ExcludedMiddle, Peirce]
+  intros EM a b Hab
+  apply (Or.elim (EM a))
+  -- A holds
+  . intros ha
+    apply ha
+  -- ¬A holds
+  . intros HnotA
+    apply Hab
+    intros Ha
+    apply False.elim
+    apply HnotA
+    apply Ha
 
 /- 3.2 (**optional**). Prove the following implication using tactics. -/
 
