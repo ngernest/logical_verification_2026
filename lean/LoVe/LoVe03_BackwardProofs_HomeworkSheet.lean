@@ -28,34 +28,59 @@ Hint: Some strategies for carrying out such proofs are described at the end of
 Section 3.3 in the Hitchhiker's Guide. -/
 
 theorem B (a b c : Prop) :
-    (a → b) → (c → a) → c → b :=
-  sorry
+    (a → b) → (c → a) → c → b := by
+  intros Hab Hca Hc
+  apply Hab
+  apply Hca
+  exact Hc
+
 
 theorem S (a b c : Prop) :
-    (a → b → c) → (a → b) → a → c :=
-  sorry
+    (a → b → c) → (a → b) → a → c := by
+  intros Habc Hab Ha
+  apply Habc
+  . apply Ha
+  . apply Hab
+    apply Ha
 
 theorem nonsense1 (a b c d : Prop) :
-    ((a → b) → c → d) → c → b → d :=
-  sorry
+    ((a → b) → c → d) → c → b → d := by
+  intros Habcd Hc Hb
+  apply Habcd
+  . intros Ha
+    exact Hb
+  . exact Hc
 
 theorem nonsense2 (a b c : Prop) :
-    (a → b) → (a → c) → a → b → c :=
-  sorry
+    (a → b) → (a → c) → a → b → c := by
+  intros Hab Hac Ha Hb
+  apply Hac
+  exact Ha
 
 theorem nonsense3 (a b c : Prop) :
-    (c → (a → b) → a) → c → b → a :=
-  sorry
+    (c → (a → b) → a) → c → b → a := by
+  intros Hcaba Hc Hb
+  apply Hcaba
+  exact Hc
 
 theorem nonsense4 (a b c : Prop) :
-    (a → a → b) → (b → c) → a → b → c :=
-  sorry
+    (a → a → b) → (b → c) → a → b → c := by
+  intros Haab Hbc Ha Hb
+  apply Hbc
+  exact Hb
 
 /- 1.2. Prove the following theorem using basic tactics. -/
 
 theorem weak_peirce (a b : Prop) :
-    ((((a → b) → a) → a) → b) → b :=
-  sorry
+    ((((a → b) → a) → a) → b) → b := by
+  intros Habaab
+  apply Habaab
+  intros Haba
+  apply Haba
+  intros Ha
+  apply Habaab
+  intros Haba
+  apply Ha
 
 
 /- ## Question 2: Logical Connectives
@@ -71,8 +96,17 @@ Hints:
   proof. -/
 
 theorem herman (a : Prop) :
-    ¬¬ (¬¬ a → a) :=
-  sorry
+    ¬¬ (¬¬ a → a) := by
+  repeat rw [Not]
+  intros H
+  apply H
+  intros HnotnotA
+  apply False.elim
+  apply HnotnotA
+  intros Ha
+  apply H
+  intros
+  apply Ha
 
 /- 2.2. Prove the following property about implication using basic tactics.
 
@@ -85,8 +119,17 @@ Hints:
   in the proof. -/
 
 theorem about_Impl (a b : Prop) :
-    ¬ a ∨ b → a → b :=
-  sorry
+    ¬ a ∨ b → a → b := by
+  rw [Not]
+  intros HnotAorB
+  intros Ha
+  apply (Or.elim HnotAorB)
+  . intros HnotA
+    apply False.elim
+    apply HnotA
+    apply Ha
+  . intros Hb
+    apply Hb
 
 /- 2.3. Prove the missing link in our chain of classical axiom implications.
 
@@ -109,8 +152,20 @@ Hints:
 #check ExcludedMiddle
 
 theorem EM_of_DN :
-    DoubleNegation → ExcludedMiddle :=
-  sorry
+    DoubleNegation → ExcludedMiddle := by
+  rw [DoubleNegation, ExcludedMiddle]
+  intros DNE a
+  apply DNE
+  rw [Not]
+  rw [Not]
+  intros HnotEM
+  apply HnotEM
+  apply Or.inr
+  intros Ha
+  apply HnotEM
+  apply Or.inl
+  apply Ha
+
 
 /- 2.4. We have proved three of the six possible implications between
 `ExcludedMiddle`, `Peirce`, and `DoubleNegation`. State and prove the three
