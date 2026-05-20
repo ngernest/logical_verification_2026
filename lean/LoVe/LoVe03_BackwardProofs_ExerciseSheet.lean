@@ -201,8 +201,15 @@ theorem Peirce_of_EM :
 /- 3.2 (**optional**). Prove the following implication using tactics. -/
 
 theorem DN_of_Peirce :
-    Peirce → DoubleNegation :=
-  sorry
+    Peirce → DoubleNegation := by
+  rw [Peirce, DoubleNegation]
+  intros Peirce a HnotnotA
+  apply (Peirce a False)
+  intros HnotA
+  change ((a -> False) -> False) at HnotnotA
+  apply False.elim
+  apply HnotnotA
+  apply HnotA
 
 /- We leave the remaining implication for the homework: -/
 
