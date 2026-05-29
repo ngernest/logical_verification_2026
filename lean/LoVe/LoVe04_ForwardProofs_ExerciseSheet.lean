@@ -21,48 +21,100 @@ namespace LoVe
 
 theorem I (a : Prop) :
     a → a :=
-  sorry
+  assume ha : a
+  show a from ha
+
+
+
 
 theorem K (a b : Prop) :
     a → b → b :=
-  sorry
+  assume ha : a
+  assume hb : b
+  show b from hb
 
 theorem C (a b c : Prop) :
     (a → b → c) → b → a → c :=
-  sorry
+  assume f : a → b → c
+  assume hb : b
+  assume ha : a
+  f ha hb
 
 theorem proj_fst (a : Prop) :
     a → a → a :=
-  sorry
+  assume ha : a
+  assume ha' : a
+  show a from ha
 
 /- Please give a different answer than for `proj_fst`. -/
 
 theorem proj_snd (a : Prop) :
     a → a → a :=
-  sorry
+  assume ha : a
+  assume ha' : a
+  show a from ha'
 
 theorem some_nonsense (a b c : Prop) :
     (a → b → c) → a → (a → c) → b → c :=
-  sorry
+  assume habc : a → b → c
+  assume ha : a
+  assume hac : a → c
+  assume hb : b
+  hac ha
 
 /- 1.2. Supply a structured proof of the contraposition rule. -/
 
 theorem contrapositive (a b : Prop) :
     (a → b) → ¬ b → ¬ a :=
-  sorry
+  assume hab : a → b
+  assume notB : ¬ b
+  assume ha : a
+  have hb : b :=
+    hab ha
+  show False from
+    notB hb
 
 /- 1.3. Supply a structured proof of the distributivity of `∀` over `∧`. -/
 
 theorem forall_and {α : Type} (p q : α → Prop) :
     (∀x, p x ∧ q x) ↔ (∀x, p x) ∧ (∀x, q x) :=
-  sorry
+  Iff.intro
+    (assume h : ∀x, p x ∧ q x
+     show (∀x, p x) ∧ (∀x, q x) from
+       by
+        apply And.intro
+        . intros x
+          specialize h x
+          obtain ⟨hp, _⟩ := h
+          assumption
+        . intros x
+          specialize h x
+          obtain ⟨_, hq⟩ := h
+          assumption)
+    (assume h : (∀x, p x) ∧ (∀x, q x)
+     show ∀x, p x ∧ q x from
+       by
+        intros x
+        obtain ⟨hp, hq⟩ := h
+        apply And.intro
+        . apply hp
+        . apply hq)
 
 /- 1.4 (**optional**). Supply a structured proof of the following property,
 which can be used to pull a `∀` quantifier past an `∃` quantifier. -/
 
 theorem forall_exists_of_exists_forall {α : Type} (p : α → α → Prop) :
     (∃x, ∀y, p x y) → (∀y, ∃x, p x y) :=
-  sorry
+  assume hpxy : ∃x, ∀y, p x y
+  fix b : α
+  show ∃ x, p x b from
+    Exists.elim
+      hpxy
+      (fix a : α
+       assume h : ∀ (y : α), p a y
+       show ∃ x, p x b from
+         Exists.intro a (h b))
+
 
 
 /- ## Question 2: Chain of Equalities
