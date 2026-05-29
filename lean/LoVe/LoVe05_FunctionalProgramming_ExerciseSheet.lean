@@ -98,8 +98,10 @@ def drop {α : Type} : ℕ → List α → List α
 To avoid unpleasant surprises in the proofs, we recommend that you follow the
 same recursion pattern as for `drop` above. -/
 
-def take {α : Type} : ℕ → List α → List α :=
-  sorry
+def take {α : Type} : ℕ → List α → List α
+  | 0,     _       => []
+  | _ + 1, []      => []
+  | m + 1, x :: xs => x :: take m xs
 
 #eval take 0 [3, 7, 11]   -- expected: []
 #eval take 1 [3, 7, 11]   -- expected: [3]
@@ -114,12 +116,19 @@ Notice that they are registered as simplification rules thanks to the `@[simp]`
 attribute. -/
 
 @[simp] theorem drop_nil {α : Type} :
-    ∀n : ℕ, drop n ([] : List α) = [] :=
-  sorry
+    ∀n : ℕ, drop n ([] : List α) = [] := by
+  intros n
+  cases n with
+  | zero => rfl
+  | succ n' => rfl
+
 
 @[simp] theorem take_nil {α : Type} :
-    ∀n : ℕ, take n ([] : List α) = [] :=
-  sorry
+    ∀n : ℕ, take n ([] : List α) = [] := by
+  intros n
+  cases n with
+  | zero => rfl
+  | succ n' => rfl
 
 /- 2.3. Follow the recursion pattern of `drop` and `take` to prove the
 following theorems. In other words, for each theorem, there should be three
@@ -130,16 +139,28 @@ two arguments to `drop`). For the third case, `← add_assoc` might be useful. -
 
 theorem drop_drop {α : Type} :
     ∀(m n : ℕ) (xs : List α), drop n (drop m xs) = drop (n + m) xs
-  | 0,     n, xs      => by rfl
+  | 0, n, xs  => by rfl
+  | m' + 1, n, [] => by simp [drop]
+  | m' + 1, n, x::xs => by
+    simp [drop]
+    apply (drop_drop m' n xs)
   -- supply the two missing cases here
 
 theorem take_take {α : Type} :
-    ∀(m : ℕ) (xs : List α), take m (take m xs) = take m xs :=
-  sorry
+    ∀(m : ℕ) (xs : List α), take m (take m xs) = take m xs
+  | 0, xs => by rfl
+  | m' + 1, [] => by simp [take]
+  | m' + 1, x::xs' => by
+    simp [take]
+    apply (take_take m' xs')
 
 theorem take_drop {α : Type} :
-    ∀(n : ℕ) (xs : List α), take n xs ++ drop n xs = xs :=
-  sorry
+    ∀(n : ℕ) (xs : List α), take n xs ++ drop n xs = xs
+  | 0, xs => by rfl
+  | n' + 1, [] => by rfl
+  | n' + 1, x::xs' => by
+    simp [take, drop]
+    apply (take_drop n' xs')
 
 
 /- ## Question 3: A Type of Terms
